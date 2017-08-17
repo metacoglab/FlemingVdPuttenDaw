@@ -1,0 +1,108 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fmodern\fcharset0 Courier;\f2\fnil\fcharset0 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red27\green31\blue34;\red255\green255\blue255;\red160\green32\blue240;
+\red34\green139\blue34;\red34\green139\blue34;\red74\green70\blue67;}
+{\*\expandedcolortbl;;\cssrgb\c14118\c16078\c18039;\cssrgb\c100000\c100000\c100000;\csgenericrgb\c62745\c12549\c94118;
+\csgenericrgb\c13333\c54510\c13333;\csgenericrgb\c13333\c54510\c13333;\cssrgb\c36078\c34510\c33333;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17320\viewh15360\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs32 \cf2 \cb3 \expnd0\expndtw0\kerning0
+This repository contains analysis code for the following paper:\
+\
+Fleming, van der Putten & Daw \'93Neural mediators of changes of mind about perceptual decisions\'94\
+\
+Anonymised behavioural data files and preprocessed ROI data are included in the repository to enable replication of data analyses and rapid generation of the figures in the paper. The group-level T-maps reported in the paper are available at NeuroVault.\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 FigureX.m files will reproduce the panels of the respective figure in the paper by loading in .mat and/or .csv files containing relevant behavioural data, regression outputs or preprocessed fMRI data. The paths in these scripts require altering to point to the relevant folder in your local version of the repo. E.g. to run Figure2.m, you would alter:\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf0 \cb1 \kerning1\expnd0\expndtw0 baseDir = \cf4 '~/Dropbox/Research/Metacognition/stateactionexpt/analysis/stan/modelfits'\cf0 ; \cf5 %% path to stan model fits
+\fs24 \cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs32 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\
+to \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf0 \cb1 \kerning1\expnd0\expndtw0 baseDir = \cf4 \'91~/pathToGithubRepo/stan/modelfits'\cf0 ; \cf5 %% path to stan model fits
+\f0\fs32 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \
+
+\b Supporting code\
+\
+mri\
+\
+
+\b0 Contains scripts for setting up the fMRI GLMs. f\cf2 \cb3 MRI data were preprocessed using standard pipelines available from our lab repository MetaLabCore (XX), using SPM 12 v. 6225 (www.fil.ion.ucl.ac.uk/spm). \
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf2 stan\
+\
+
+\b0 Contains code for fitting the computational models to behavioural data using STAN. See stan_metaConf_group.R.\
+Fitting the computational models to data requires a STAN installation ( ) and rstan ( )\
+\
+
+\b stats\
+\
+
+\b0 Contains R code for hierarchical regression analysis of behavioural and ROI data used to write out the .csv files containing the regression coefficients plotted in Figure 5, and in the Supplementary Tables. Also stores permutation test outputs for fMRI time course regressions calculated in Figure5.m, to avoid needing to recompute.\cf2 \cb3 \
+\
+\cf2 \cb3 We make use of the following packages under R:\
+lme4 (http://cran.r-project.org/web/packages/lme4)\
+R.matlab (https://cran.r-project.org/web/packages/R.matlab/index.html)\
+car (https://cran.r-project.org/web/packages/car/index.html)\
+doBy (https://cran.r-project.org/web/packages/doBy/index.html)\
+optimx (https://cran.r-project.org/web/packages/optimx/index.html)\
+stargazer (https://cran.r-project.org/web/packages/stargazer/index.html)\
+\
+Implementing the mediation analyses in MATLAB requires the Mediation Toolbox, available here:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf6 \cb1 \kerning1\expnd0\expndtw0 https://canlabweb.colorado.edu/wiki/doku.php/help/mediation/m3_mediation_fmri_toolbox
+\f0\fs32 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \
+\pard\pardeftab720\partightenfactor0
+
+\b\fs40 \cf2 \cb3 License\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\b0\fs32 \cf2 \cb3 This code is being released with a permissive open-source license. You should feel free to use or adapt the utility code as long as you follow the terms of the license, which are enumerated below. If you make use of or build on the computational models or behavioural/neuroimaging analyses, we would appreciate that you cite the paper.\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 Copyright (c) 2017, Stephen Fleming\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs28 \cf7 \cb3 Permission is hereby granted, free of charge, to any person obtaining a copy\
+of this software and associated documentation files (the "Software"), to deal\
+in the Software without restriction, including without limitation the rights\
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\
+copies of the Software, and to permit persons to whom the Software is\
+furnished to do so, subject to the following conditions:\
+\
+The above copyright notice and this permission notice shall be included in all\
+copies or substantial portions of the Software.\
+\
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\
+SOFTWARE.}

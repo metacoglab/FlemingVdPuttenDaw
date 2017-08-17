@@ -15,7 +15,7 @@ baseDir = '~/Dropbox/Research/Metacognition/stateactionexpt/github/stan/modelfit
 to 
 
 ```
-baseDir = ‘~/pathToGithubRepo/github/stan/modelfits'; %% path to stan model fits
+baseDir = ‘~/pathToGithubRepo/stan/modelfits'; %% path to stan model fits
 ```
 
 **Supporting code**

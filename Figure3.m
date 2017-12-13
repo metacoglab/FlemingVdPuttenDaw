@@ -10,12 +10,12 @@ cwd = pwd;
 
 fs = filesep;
 addpath(genpath('~/Dropbox/Utils/fmri/MetaLabCore/'));
-dir_roiData = '~/Dropbox/Research/Metacognition/stateactionexpt/github/fmri/roidata_post';
-dir_roiData_upsampled = '~/Dropbox/Research/Metacognition/stateactionexpt/github/fmri/roidata_upsample';
-dir_datafiles = '~/Dropbox/Research/Metacognition/stateactionexpt/github/data';
-dir_modelfiles = '~/Dropbox/Research/Metacognition/stateactionexpt/github/regressors';
+dir_roiData = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_post';
+dir_roiData_upsampled = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_upsample';
+dir_datafiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/data';
+dir_modelfiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/regressors';
 
-model = 'ideal';
+model = 'ideal_dt';
 name_subj = {'sub12','sub13','sub14','sub15','sub16','sub17','sub18','sub19','sub23',...
     'sub24','sub25','sub26','sub27','sub28','sub30','sub31','sub32','sub33','sub34','sub35','sub36','sub37'};
 rois = {'pMFC'};
@@ -87,7 +87,7 @@ for r = 1:length(rois)
             end
         end
         
-        %% Compute relevant means as function of postcoh
+        %% Compute relevant means as function of post-decision coherence/accuracy
         for i = 1:3
             bold_correct(s,i) = mean(Ynew(ROI.acc == 1 & ROI.postcoh == i));
             bold_error(s,i) = mean(Ynew(ROI.acc ~= 1 & ROI.postcoh == i));
@@ -102,10 +102,17 @@ for r = 1:length(rois)
         %% Compute relevant means per bin of post-decision evidence
         subjectIndex = find(strcmp(name_subj{s}, output.subj));  % exclude BOLD outliers from model variables
         postDE = logOddsPost(~err & ~output.exclusion{subjectIndex});
-        postDEBins = linspace(min(postDE), max(postDE), 6);
+        postDEBins = linspace(min(postDE), max(postDE), 5);
         for b = 1:length(postDEBins)-1
             bold_postDE(s,b) = mean(Ynew(postDE > postDEBins(b) & postDE <= postDEBins(b+1)));
             postDEcenter(s,b) = (postDEBins(b+1) + postDEBins(b))/2;
+        end
+        
+        preDE = logOddsPre(~err & ~output.exclusion{subjectIndex});
+        preDEBins = linspace(min(preDE), max(preDE), 5);
+        for b = 1:length(preDEBins)-1
+            bold_preDE(s,b) = mean(Ynew(preDE > preDEBins(b) & preDE <= preDEBins(b+1)));
+            preDEcenter(s,b) = (preDEBins(b+1) + preDEBins(b))/2;
         end
              
         % Get linear fits
@@ -121,10 +128,10 @@ for r = 1:length(rois)
         cd(cwd)
         
         subjectMean(s,:) = nanmean(ROI.time_series);
-        subjectXtime(s,:) = ([1:length(ROI.time_series(1,:))].*ROI.spec.samp_reso) - ROI.spec.samp_reso;  % this should be same for all subjects, subtract one bin to start at 0
+        subjectXtime(s,:) = ([1:length(ROI.time_series(1,:))].*ROI.spec.samp_reso) - ROI.spec.samp_reso;  % this is the same for all subjects, subtract one bin to start at 0
         
         % Extract out condition means as function of accuracy and
-        % post-decision evidece
+        % post-decision motion coherence
         for i = 1:3
             bold_correct_ups{i}(s,:) = nanmean(ROI.time_series(~err & accuracy == 1 & postcoh == i,:));
             bold_error_ups{i}(s,:) = nanmean(ROI.time_series(~err & accuracy ~= 1 & postcoh == i,:));
@@ -143,27 +150,30 @@ for r = 1:length(rois)
     mean_bold_error = mean(bold_error);
     sem_bold_error = std(bold_error)./sqrt(length(name_subj));
     hold on
-    for i = 1:3
-        errorbar(xcenters(i), mean_bold_error(i), sem_bold_error(i), 'o ', 'Color', errcolor(i,:), 'MarkerSize', 12, 'LineWidth', 2);
-        errorbar(xcenters(i), mean_bold_correct(i), sem_bold_correct(i), 'o ', 'Color', corcolor(i,:), 'MarkerSize', 12, 'LineWidth', 2);
-    end
-    plot(xcenters, mean(fit_error), 'r', 'LineWidth', 2)
-    plot(xcenters, mean(fit_correct), 'g', 'LineWidth', 2)
-    set(gca, 'XTick', xcenters, 'XTickLabel', {'Low', 'Med', 'High', 'Low', 'Med', 'High'}, 'FontSize', 16);
+    plot(xcenters-0.2, mean(fit_correct), 'g', 'LineWidth', 2)
+    plot(xcenters+0.2, mean(fit_error), 'r', 'LineWidth', 2)
+    hb = boxplot(bold_correct, 'positions', xcenters-0.2, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'g');
+    set(hb,'LineWidth', 2)
+    hb = boxplot(bold_error, 'positions', xcenters+0.2, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'r');
+    set(hb,'LineWidth', 2)
+    set(gca, 'XLim', [0.2 3.8], 'XTick', xcenters, 'XTickLabel', {'Low', 'Med', 'High'}, 'FontSize', 16);
     ylabel('BOLD a.u.')
     box off
     
     % Post-decision evidence figure
     h = figure;
     set(gcf, 'Position', [300 300 400 275])
+    mean_bold_preDE = nanmean(bold_preDE);
+    sem_bold_preDE = nanstd(bold_preDE)./sqrt(length(name_subj));
     mean_bold_postDE = nanmean(bold_postDE);
     sem_bold_postDE = nanstd(bold_postDE)./sqrt(length(name_subj));
     hold on
-    errorbar(1:length(mean_bold_postDE), mean_bold_postDE, sem_bold_postDE, 'ko ', 'MarkerSize', 12, 'LineWidth', 2);
+    hb = boxplot(bold_postDE, 'positions', 1:length(mean_bold_postDE), 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'k');
+    set(hb, 'LineWidth', 2)
     plot(1:length(mean_bold_postDE), nanmean(fit_postDE), 'k', 'LineWidth', 2)
     set(gca, 'FontSize', 16, 'XTick', 1:length(mean_bold_postDE));
     ylabel('BOLD a.u.')
-    xlabel('Post-decision evidence bins')
+    xlabel('PDE bins (\Delta LO_{correct})')
     box off
     
     % Upsampled post-decision evidence figure

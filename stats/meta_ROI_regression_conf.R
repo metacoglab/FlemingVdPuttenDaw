@@ -12,9 +12,9 @@ require(doBy)
 require(optimx)
 require(stargazer)
 options(contrasts = c("contr.treatment", "contr.poly")) # This is R defaults but set it anyway to be safe
-source("~/Dropbox/Research/Metacognition/stateactionexpt/github/stats/errorBar.R")
+source("~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stats/errorBar.R")
 
-dataDir = "~/Dropbox/Research/Metacognition/stateactionexpt/github/fmri/roidata_conf"
+dataDir = "~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_conf"
 subjects =c(seq(12,19), seq(23,28), seq(30,37))
 rois = c("pMFC", "union_46", "union_FPL", "union_FPm", "vmPFC", "rVS_FSL_structAtlas")
 

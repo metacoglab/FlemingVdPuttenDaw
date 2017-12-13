@@ -3,49 +3,26 @@
 % Reproduces Figure 2 in Fleming, van der Putten & Daw
 %
 % Steve Fleming stephen.fleming@ucl.ac.uk 2017
-
 clear all
 close all
 fs = filesep;
 
-saveRegressors = 0;
 dataset = input('Which dataset? 2=behav, 3=fmri ');
-model = 'ideal'; % which model to simulate predictions from
+model = 'ideal_dt';
 
-simTrials = 5000;    % how many trials to simulate per parameter draw per condition (9 conditions)
-Ndraws = 100;    % how many draws from subject-level posteriors
-conf_sigma = 0.025; % fixed parameter relating model to observed confidence
+Ndraws = 10;    % how many draws from subject-level posteriors / simulated trial sequences to average over
+conf_sigma = 0.025; % Fixed parameter relating model to observed confidence
 
 cwd = pwd;
-baseDir = '~/Dropbox/Research/Metacognition/stateactionexpt/github/stan/modelfits'; %% path to stan model fits
-
-%% Load fitted parameters and data
+baseDir = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stan/modelfits/indiv';
+dirData = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/data';
 fitsDir = [baseDir fs model fs];
 
-switch model
-    case {'weighted', 'accweighted'}
-        cd(fitsDir)
-        w = csvread(['subParams_w_dataset' num2str(dataset) '.csv'],1,1);
-        w_sd = csvread(['subParams_w_sd_dataset' num2str(dataset) '.csv'],1,1);
-    case 'mapping'
-        cd(fitsDir)
-        gamma = csvread(['subParams_gamma_dataset' num2str(dataset) '.csv'],1,1);
-        gamma_sd = csvread(['subParams_gamma_sd_dataset' num2str(dataset) '.csv'],1,1);
-end
-cd(fitsDir)
-k1 = csvread(['subParams_k1_dataset' num2str(dataset) '.csv'],1,1);
-k1_sd = csvread(['subParams_k1_sd_dataset' num2str(dataset) '.csv'],1,1);
-m = csvread(['subParams_m_dataset' num2str(dataset) '.csv'],1,1);
-m_sd = csvread(['subParams_m_sd_dataset' num2str(dataset) '.csv'],1,1);
-cd(cwd);
-
 if dataset == 2
-    dirData = '~/Dropbox/Research/Metacognition/stateactionexpt/github/data/'; % fmri experiment data out of scanner
     filename = 'fMRI_pilotData_sub_';    % use for fMRI
     suffix = ''; % use for fMRI data out-of-scanner
     subjects = [12:28 30:37];
 elseif dataset == 3
-    dirData = '~/Dropbox/Research/Metacognition/stateactionexpt/github/data/'; % fmri experiment data
     filename = 'fMRI_pilotData_sub_';    % use for fMRI
     suffix = '_fMRI';
     subjects = [12:19 23:28 30:37];
@@ -56,15 +33,15 @@ allConf_cor = cell(1,9);   % stores aggregate confidence data, 9 x (Ntrials*Nsub
 allConf_err = cell(1,9);
 allModelConf_cor = cell(1,9);
 allModelConf_err = cell(1,9);
+
 for s = 1:length(subjects)
-    
+
+    %% Load data for this subject
     datafile = [filename num2str(subjects(s)) suffix '_2.mat'];
     cd(dirData);
     load(datafile);
     cd(cwd);
     
-    conf = [];
-    acc = [];
     precoh_index = [];
     postcoh_index = [];
     
@@ -74,7 +51,7 @@ for s = 1:length(subjects)
     dir(dir==0.5) = -1;
     action = locDATA.button_response - 1;
     conf = locDATA.mouse_response;
-    rt = log(locDATA.reaction_time_button);
+    logrt = log(locDATA.reaction_time_button);
     conf_rt = log(locDATA.reaction_time_mouse);
     transformed_action = action;
     transformed_action(action == 0) = -1;
@@ -95,7 +72,8 @@ for s = 1:length(subjects)
     err_type2(s) = sum(isnan(conf) & ~isnan(action));
     err_tot(s) = sum(isnan(action) | isnan(conf));
     
-    %% confidence/performance 3x3 for each subject
+    %% Confidence/performance
+    % 3x3
     j=1;
     for post = 1:3
         for pre = 1:3
@@ -108,89 +86,89 @@ for s = 1:length(subjects)
         end
     end
     
-    %% generate model data from subject-level parameter draws
-    for draw = 1:Ndraws
-        conf = [];
-        acc = [];
-        precoh_index = [];
-        postcoh_index = [];
-        j=1;
+    % Marginals
+    for p = 1:3
+        mean_conf_pre_cor(p, s) = nanmean(conf(precoh_index == p & acc == 1));
+        mean_conf_pre_err(p, s) = nanmean(conf(precoh_index == p & acc == 0));
+        mean_conf_post_cor(p, s) = nanmean(conf(postcoh_index == p & acc == 1));
+        mean_conf_post_err(p, s) = nanmean(conf(postcoh_index == p & acc == 0));
+    end
+    
+    %% Load model parameters
+    modelfile = [model '_sub' num2str(subjects(s)) '_dataset' num2str(dataset) '_fit.mat'];
+    cd(fitsDir)
+    load(modelfile)
+    cd(cwd)
+    
+    model_conf_vec = [];
+    model_perf_vec = [];
+    model_precoh_vec = [];
+    model_postcoh_vec = [];
+    %% Generate model data and point log-likelihoods from subject-level parameters using actual trial sequence
+    for rep = 1:Ndraws
         % draw parameters for this replication
-        k1_rep = normrnd(k1(s), k1_sd(s));
-        m_rep = normrnd(m(s), m_sd(s));
+        k1_rep = normrnd(sub_param.k1, sub_param.k1_sd);
+        m_rep = normrnd(sub_param.m, sub_param.m_sd);
         switch model
-            case {'weighted', 'accweighted'}
-                w_rep = normrnd(w(s), w_sd(s));
-                if w_rep < 0
-                    w_rep = 0;
-                elseif w_rep > 1;
-                    w_rep = 1;
-                end
+            case {'ideal', 'random'} % this is a hack, parameters have no influence for random
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep);
+            case {'choicebias'}
+                b_rep = normrnd(sub_param.w, sub_param.w_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'b', b_rep);
+            case {'weighted', 'choiceweighted'}
+                w1_rep = normrnd(sub_param.w1, sub_param.w1_sd);
+                w2_rep = normrnd(sub_param.w2, sub_param.w2_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'w1', w1_rep, 'w2', w2_rep);
             case 'mapping'
-                gamma_rep = normrnd(gamma(s), gamma_sd(s));
+                gamma_rep = normrnd(sub_param.gamma, sub_param.gamma_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'gamma', gamma_rep);
+            case 'ideal_dt'
+                brt_rep = normrnd(sub_param.brt, sub_param.brt_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'brt', brt_rep, 'logrt', logrt);
+            case {'choicebias_dt'}
+                b_rep = normrnd(sub_param.w, sub_param.w_sd);
+                brt_rep = normrnd(sub_param.brt, sub_param.brt_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'b', b_rep, 'brt', brt_rep, 'logrt', logrt);
+            case {'weighted_dt', 'choiceweighted_dt'}
+                w1_rep = normrnd(sub_param.w1, sub_param.w1_sd);
+                w2_rep = normrnd(sub_param.w2, sub_param.w2_sd);
+                brt_rep = normrnd(sub_param.brt, sub_param.brt_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'w1', w1_rep, 'w2', w2_rep, 'brt', brt_rep, 'logrt', logrt);
+            case 'mapping_dt'
+                gamma_rep = normrnd(sub_param.gamma, sub_param.gamma_sd);
+                brt_rep = normrnd(sub_param.brt, sub_param.brt_sd);
+                sim = metaModelFit_generate_trialSequence(dir, action, conf, coherence, precoh_index, postcoh_index, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'gamma', gamma_rep, 'brt', brt_rep, 'logrt', logrt);
         end
+        % Store matrix of model output with rows = samples, columns =
+        % trials
+        model_conf_vec = [model_conf_vec sim.modelConf];
+        model_perf_vec = [model_perf_vec sim.modelAcc];
+        model_precoh_vec = [model_precoh_vec precoh_index];
+        model_postcoh_vec = [model_postcoh_vec postcoh_index];
         
-        for post = 1:3
-            for pre = 1:3
-                
-                switch model
-                    case 'ideal'
-                        simdata = metaModelFit_generate_data(simTrials, coherence, pre, post, conf_sigma, model, 'k1', k1(s), 'm', m(s));
-                    case {'weighted', 'accweighted'}
-                        simdata = metaModelFit_generate_data(simTrials, coherence, pre, post, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'w', w_rep);
-                    case 'mapping'
-                        simdata = metaModelFit_generate_data(simTrials, coherence, pre, post, conf_sigma, model, 'k1', k1_rep, 'm', m_rep, 'gamma', gamma_rep);
-                end
-                
-                % get big vectors concatenated over conditions, conditional
-                % on accuracy from the model's choices
-                conf = [conf simdata.conf];
-                acc = [acc simdata.acc];
-                precoh_index = [precoh_index ones(1,length(simdata.conf)).*pre];
-                postcoh_index = [postcoh_index ones(1,length(simdata.conf)).*post];
-                allModelConf_cor{j} = [allModelConf_cor{j} simdata.conf(simdata.acc == 1)];
-                allModelConf_err{j} = [allModelConf_err{j} simdata.conf(simdata.acc == 0)];
-                
-                % take averages per condition
-                model_perf_bydraw(s,j,draw) = nanmean(simdata.acc)*100;
-                model_loglikPost_cor_bydraw(pre,post,draw) = nanmean(simdata.loglik_post(simdata.acc == 1));
-                model_loglikPost_err_bydraw(pre,post,draw) = nanmean(simdata.loglik_post(simdata.acc == 0));
-                model_loglikPre_cor_bydraw(pre,post,draw) = nanmean(simdata.loglik_pre(simdata.acc == 1));
-                model_loglikPre_err_bydraw(pre,post,draw) = nanmean(simdata.loglik_pre(simdata.acc == 0));
-                model_conf_cor_bydraw(s,j,draw) = nanmean(simdata.conf(simdata.acc == 1));
-                model_conf_err_bydraw(s,j,draw) = nanmean(simdata.conf(simdata.acc == 0));
-                
-                j=j+1;
-            end
+    end
+    %% Average over simulations
+    disp(['Finished simulation for model ' model ', subject ' num2str(s)])
+    
+    % Get model predictions by condition per subject
+    j=1;
+    for post = 1:3
+        for pre = 1:3
+            model_conf_cor(s, j) = real(nanmean(model_conf_vec(model_perf_vec == 1 & model_precoh_vec == pre & model_postcoh_vec == post)));
+            model_conf_err(s, j) = real(nanmean(model_conf_vec(model_perf_vec == 0 & model_precoh_vec == pre & model_postcoh_vec == post)));
+            model_perf(s, j) = nanmean(model_perf_vec(model_precoh_vec == pre & model_postcoh_vec == post)).*100;
+            allModelConf_cor{j} = [allModelConf_cor{j} model_conf_vec(model_perf_vec == 1 & model_precoh_vec == pre & model_postcoh_vec == post)];
+            allModelConf_err{j} = [allModelConf_err{j} model_conf_vec(model_perf_vec == 0 & model_precoh_vec == pre & model_postcoh_vec == post)];
+            j=j+1;
         end
-        
-        disp(['Parameter draw ' num2str(draw) ' out of ' num2str(Ndraws)])
     end
-    
-    % marginalise over parameter draws
-    model_perf = nanmean(model_perf_bydraw, 3);
-    model_loglikPre_cor = nanmean(model_loglikPre_cor_bydraw, 3);
-    model_loglikPre_err = nanmean(model_loglikPre_err_bydraw, 3);
-    model_loglikPost_cor = nanmean(model_loglikPost_cor_bydraw, 3);
-    model_loglikPost_err = nanmean(model_loglikPost_err_bydraw, 3);
-    model_conf_cor = nanmean(model_conf_cor_bydraw, 3);
-    model_conf_err = nanmean(model_conf_err_bydraw, 3);
-    
-    if sum(any(isnan(model_loglikPost_err))) | sum(any(isnan(model_loglikPost_cor)))    % not enough trials to get estimate
-        warning('Not enough draws to get a good estimate, increase simTrials')
-    end
-        
-    if saveRegressors && dataset == 3
-        % store regressors for use in mediation modeling of fMRI data
-        cd regressors
-        save([model num2str(subjects(s)) '_loglikPost.mat'], 'model_loglikPre_cor', 'model_loglikPre_err', 'model_loglikPost_cor', 'model_loglikPost_err');
-        cd(cwd);
-    end
-    
-    disp(['Finished simulation for subject ' num2str(s)])
-    
     
 end
+
+% Ensure that NaN confidence entries in behav due to ceiling performance
+% are matched in model output
+temp_nan = isnan(conf_err);
+model_conf_err(temp_nan) = NaN;
 
 %% PLOTS
 %

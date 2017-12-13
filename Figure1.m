@@ -6,7 +6,8 @@
 clear all
 close all
 
-ntrials = 10000;  % N trials per condition
+% ntrials = 10000;  % N trials per condition
+ntrials = 100;
 k1 = 4; % mapping from coherence to evidence 
 m = 0; % choice bias
 coh = linspace(0.1,0.5,3); % coherence values 
@@ -87,28 +88,28 @@ post_LOCacc = [mean(mean_LOCpost_cor_L) mean(mean_LOCpost_cor_R) mean(mean_LOCpo
 h1 = figure;
 set(gcf, 'Position', [400 400 1200 300])
 subplot(1,3,1)
-plot([1 2 3], post_LORacc(1:3), 'g', 'LineWidth', 3)
+plot([1 2 3], post_LORacc(1:3), 'g--', 'LineWidth', 3)
 hold on
-plot([1 2 3], post_LORacc(4:6), 'g--', 'LineWidth', 3)
-plot([1 2 3]+0.2, post_LORacc(7:9), 'r', 'LineWidth', 3)
-plot([1 2 3]+0.2, post_LORacc(10:12), 'r--', 'LineWidth', 3)
+plot([1 2 3], post_LORacc(4:6), 'g', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LORacc(7:9), 'r--', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LORacc(10:12), 'r', 'LineWidth', 3)
 set(gca, 'XLim', [0.5 3.5], 'XTick', [1 2 3], 'XTickLabel', {'Low', 'Med', 'High'}, 'FontSize', 16);
 xlabel('Postdecision motion strength','FontSize',20);
-ylabel('Log-odds rightward','FontSize',20)
-legend('Left, correct', 'Right, correct', 'Left, error', 'Right, error', 'Location', 'NorthWest')
+ylabel('\Delta Log-odds rightward','FontSize',20)
+legend('Left, correct', 'Right, correct', 'Left, error', 'Right, error', 'Location', 'East')
 legend boxoff
 box off
 
 subplot(1,3,2)
-plot([1 2 3], post_LOCacc(1:3), 'g', 'LineWidth', 3)
+plot([1 2 3], post_LOCacc(1:3), 'g--', 'LineWidth', 3)
 hold on
-plot([1 2 3]+0.2, post_LOCacc(4:6), 'g--', 'LineWidth', 3)
-plot([1 2 3], post_LOCacc(7:9), 'r', 'LineWidth', 3)
-plot([1 2 3]+0.2, post_LOCacc(10:12), 'r--', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LOCacc(4:6), 'g', 'LineWidth', 3)
+plot([1 2 3], post_LOCacc(7:9), 'r--', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LOCacc(10:12), 'r', 'LineWidth', 3)
 set(gca, 'XLim', [0.5 3.5], 'XTick', [1 2 3], 'XTickLabel', {'Low', 'Med', 'High'}, 'FontSize', 16);
 xlabel('Postdecision motion strength','FontSize',20);
-ylabel('Log-odds correct','FontSize',20)
-legend('Left, correct', 'Right, correct', 'Left, error', 'Right, error', 'Location', 'NorthWest')
+ylabel('\Delta Log-odds correct','FontSize',20)
+legend('Left, correct', 'Right, correct', 'Left, error', 'Right, error', 'Location', 'East')
 legend boxoff
 box off
 
@@ -118,17 +119,17 @@ conf = 1./(1+exp(-baseLOC));
 acc = conf > 0.5;
 qsr = 1-((acc - conf).^2);
 subplot(1,3,3)
+% line([0 0], [0 1], 'Color', 'k', 'LineStyle', '--', 'LineWidth', 2)
 plot(baseLOC, conf, 'k', 'LineWidth', 3)
 hold on
 plot(baseLOC, qsr, 'k--', 'LineWidth', 3)
 set(gca, 'FontSize', 16, 'XLim', [min(baseLOC) max(baseLOC)]);
-xlabel('Total log-odds correct','FontSize',20);
+xlabel('Final log-odds correct','FontSize',20);
 ylabel('Confidence / value','FontSize',20)
-legend('Confidence', 'Value', 'Location', 'SouthEast')
-legend boxoff
 fill([min(baseLOC) 0 0 min(baseLOC)], [0 0 1 1],[0.6 0.6 1]);
 fill([0 max(baseLOC) max(baseLOC) 0], [0 0 1 1],[0.8 0.8 0.8]);
 plot(baseLOC, conf, 'k', 'LineWidth', 3)
 plot(baseLOC, qsr, 'k--', 'LineWidth', 3)
 box off
-
+legend('Confidence', 'Value', 'Location', 'West')
+legend boxoff

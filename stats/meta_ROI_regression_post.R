@@ -12,14 +12,16 @@ require(doBy)
 require(optimx)
 require(stargazer)
 options(contrasts = c("contr.treatment", "contr.poly")) # This is R defaults but set it anyway to be safe
-source("~/Dropbox/Research/Metacognition/stateactionexpt/github/stats/errorBar.R")
+source("~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stats/errorBar.R")
 
-dataDir = "~/Dropbox/Research/Metacognition/stateactionexpt/github/fmri/roidata_post"
-modelDir = "~/Dropbox/Research/Metacognition/stateactionexpt/github/regressors"
+dataDir = "~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_post"
+modelDir = "~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/regressors"
 subjects =c(seq(12,19), seq(23,28), seq(30,37))
 rois = c("pMFC", "union_46", "union_FPL", "union_FPm", "vmPFC", "rVS_FSL_structAtlas")
 
 # Extract out data from mat files
+# This is a bit inefficient as only the ROI signal changes from loop to loop
+prepost_pval = NA
 for (r in 1:length(rois)) {
   bigData = NULL
   
@@ -31,7 +33,7 @@ for (r in 1:length(rois)) {
     dat = DATA$ROI
     
     setwd(modelDir)
-    modelDATA = readMat(paste('ideal', subjects[s], '_loglikPost.mat',sep=""))
+    modelDATA = readMat(paste('ideal_dt', subjects[s], '_loglikPost.mat',sep=""))
     loglikpre_cor = modelDATA$model.loglikPre.cor
     loglikpost_cor = modelDATA$model.loglikPost.cor
     loglikpre_err = modelDATA$model.loglikPre.err
@@ -111,7 +113,7 @@ for (r in 1:length(rois)) {
   # P-values and estimates
   print(summary(logoddsModel))
   print(Anova(logoddsModel, type=3))
-  
+
   # Store as individual model for plotting in table
   eval(parse(text = paste("logoddsModel", r, "= logoddsModel", sep="")))
   
@@ -120,4 +122,3 @@ for (r in 1:length(rois)) {
 # Plot all regressions in one big table
 stargazer(postcohModel1, postcohModel2, postcohModel3, postcohModel4, postcohModel5, postcohModel6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("accuracy", "pre-decision coherence", "post-decision coherence", "pre*accuracy", "post*accuracy", "log(RT)"), order = c(2, 1, 3, 5, 6, 4))
 stargazer(logoddsModel1, logoddsModel2, logoddsModel3, logoddsModel4, logoddsModel5, logoddsModel6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("Log-odds correct (pre)", "Log-odds correct (post)", "log(RT)"))
-

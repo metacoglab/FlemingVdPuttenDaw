@@ -163,8 +163,6 @@ for r = 1:length(rois)
     % Post-decision evidence figure
     h = figure;
     set(gcf, 'Position', [300 300 400 275])
-    mean_bold_preDE = nanmean(bold_preDE);
-    sem_bold_preDE = nanstd(bold_preDE)./sqrt(length(name_subj));
     mean_bold_postDE = nanmean(bold_postDE);
     sem_bold_postDE = nanstd(bold_postDE)./sqrt(length(name_subj));
     hold on
@@ -176,7 +174,7 @@ for r = 1:length(rois)
     xlabel('PDE bins (\Delta LO_{correct})')
     box off
     
-    % Upsampled post-decision evidence figure
+    % Upsampled post-decision motion figure
     h = figure;
     set(gcf, 'Position', [600 300 400 275])
     corcolor = [0.7 1 0.7; 0.35 1 0.35; 0 1 0];

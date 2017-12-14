@@ -31,7 +31,7 @@ Fitting the computational models to data requires a STAN installation (http://mc
 
 **stats**
 
-Contains R code for hierarchical regression analysis of behavioural and ROI data used to write out the .csv files containing the regression coefficients plotted in Figure 5, and in the Supplementary Tables. Also stores permutation test outputs for fMRI time course regressions calculated in Figure5.m, to avoid needing to recompute.
+Contains R code for hierarchical regression analysis of behavioural and ROI data used to write out the .csv files containing the regression coefficients plotted in Figure 4, and in the Supplementary Tables. Also stores permutation test outputs for fMRI time course regressions calculated in Figure4.m, to avoid needing to recompute.
 
 We make use of the following packages under R:
 

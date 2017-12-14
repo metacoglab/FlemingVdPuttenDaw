@@ -10,7 +10,7 @@ fs = filesep;
 dataset = input('Which dataset? 2=behav, 3=fmri ');
 model = 'ideal_dt';
 
-Ndraws = 10;    % how many draws from subject-level posteriors / simulated trial sequences to average over
+Ndraws = 1000;    % how many draws from subject-level posteriors / simulated trial sequences to average over
 conf_sigma = 0.025; % Fixed parameter relating model to observed confidence
 
 cwd = pwd;
@@ -154,8 +154,8 @@ for s = 1:length(subjects)
     j=1;
     for post = 1:3
         for pre = 1:3
-            model_conf_cor(s, j) = real(nanmean(model_conf_vec(model_perf_vec == 1 & model_precoh_vec == pre & model_postcoh_vec == post)));
-            model_conf_err(s, j) = real(nanmean(model_conf_vec(model_perf_vec == 0 & model_precoh_vec == pre & model_postcoh_vec == post)));
+            model_conf_cor(s, j) = nanmean(model_conf_vec(model_perf_vec == 1 & model_precoh_vec == pre & model_postcoh_vec == post));
+            model_conf_err(s, j) = nanmean(model_conf_vec(model_perf_vec == 0 & model_precoh_vec == pre & model_postcoh_vec == post));
             model_perf(s, j) = nanmean(model_perf_vec(model_precoh_vec == pre & model_postcoh_vec == post)).*100;
             allModelConf_cor{j} = [allModelConf_cor{j} model_conf_vec(model_perf_vec == 1 & model_precoh_vec == pre & model_postcoh_vec == post)];
             allModelConf_err{j} = [allModelConf_err{j} model_conf_vec(model_perf_vec == 0 & model_precoh_vec == pre & model_postcoh_vec == post)];
@@ -213,15 +213,9 @@ xpos = [1.2 2 2.8 4.2 5 5.8 7.2 8 8.8];
 set(gcf, 'Position', [200 200 500 300])
 hold on
 
-mean_conf_cor = nanmean(conf_cor);
-sem_conf_cor = nanstd(conf_cor)./sqrt(length(subjects));
-ci_conf_cor = sem_conf_cor.*tinv(0.975,length(subjects)-1);
 mean_model_conf_cor = nanmean(model_conf_cor);
 sem_model_conf_cor = nanstd(model_conf_cor)./sqrt(length(subjects));
 ci_model_conf_cor = sem_model_conf_cor.*tinv(0.975,length(subjects)-1);
-mean_conf_err = nanmean(conf_err);
-sem_conf_err = nanstd(conf_err)./sqrt(length(subjects));
-ci_conf_err = sem_conf_err.*tinv(0.975,length(subjects)-1);
 mean_model_conf_err = nanmean(model_conf_err);
 sem_model_conf_err = nanstd(model_conf_err)./sqrt(length(subjects));
 ci_model_conf_err = sem_model_conf_err.*tinv(0.975,length(subjects)-1);

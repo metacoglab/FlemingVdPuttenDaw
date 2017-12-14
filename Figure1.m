@@ -6,8 +6,7 @@
 clear all
 close all
 
-% ntrials = 10000;  % N trials per condition
-ntrials = 100;
+ntrials = 10000;  % N trials per condition
 k1 = 4; % mapping from coherence to evidence 
 m = 0; % choice bias
 coh = linspace(0.1,0.5,3); % coherence values 
@@ -119,7 +118,6 @@ conf = 1./(1+exp(-baseLOC));
 acc = conf > 0.5;
 qsr = 1-((acc - conf).^2);
 subplot(1,3,3)
-% line([0 0], [0 1], 'Color', 'k', 'LineStyle', '--', 'LineWidth', 2)
 plot(baseLOC, conf, 'k', 'LineWidth', 3)
 hold on
 plot(baseLOC, qsr, 'k--', 'LineWidth', 3)

@@ -38,7 +38,6 @@ for r = 1:length(allRoiName)
         precoh = locDATA.dots_coherence;
         postcoh = locDATA.post_coherence;
         accuracy = locDATA.accuracy;
-        accuracy(accuracy == 0) = -1;
         conf = locDATA.mouse_response;
         err = isnan(rt) | isnan(accuracy) | isnan(conf);
         

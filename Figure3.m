@@ -10,16 +10,18 @@ cwd = pwd;
 
 fs = filesep;
 addpath(genpath('~/Dropbox/Utils/fmri/MetaLabCore/'));
-dir_roiData = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_post';
-dir_roiData_upsampled = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_upsample';
-dir_datafiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/data';
-dir_modelfiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/regressors';
+dir_roiData = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/fmri/roidata_post';
+dir_roiData_upsampled = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/fmri/roidata_upsample';
+dir_datafiles = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/data';
+dir_modelfiles = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/regressors';
 
 model = 'ideal_dt';
 name_subj = {'sub12','sub13','sub14','sub15','sub16','sub17','sub18','sub19','sub23',...
     'sub24','sub25','sub26','sub27','sub28','sub30','sub31','sub32','sub33','sub34','sub35','sub36','sub37'};
 rois = {'pMFC'};
 
+c.cor =  [0 0.45 0.74];
+c.err =  [0.85 0.33 0.10];
 xcenters = [1 2 3];
 allBetas = [];
 allSE = [];
@@ -140,7 +142,7 @@ for r = 1:length(rois)
         
     end
     
-    % Post-decision motion strength figure
+   % Post-decision motion strength figure
     h = figure;
     set(gcf, 'Position', [300 300 250 275])
     corcolor = [0.7 1 0.7; 0.35 1 0.35; 0 1 0];
@@ -150,11 +152,11 @@ for r = 1:length(rois)
     mean_bold_error = mean(bold_error);
     sem_bold_error = std(bold_error)./sqrt(length(name_subj));
     hold on
-    plot(xcenters-0.2, mean(fit_correct), 'g', 'LineWidth', 2)
-    plot(xcenters+0.2, mean(fit_error), 'r', 'LineWidth', 2)
-    hb = boxplot(bold_correct, 'positions', xcenters-0.2, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'g');
+    plot(xcenters-0.2, mean(fit_correct), 'Color', c.cor, 'LineWidth', 2)
+    plot(xcenters+0.2, mean(fit_error), 'Color', c.err, 'LineWidth', 2)
+    hb = boxplot(bold_correct, 'positions', xcenters-0.2, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', c.cor);
     set(hb,'LineWidth', 2)
-    hb = boxplot(bold_error, 'positions', xcenters+0.2, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'r');
+    hb = boxplot(bold_error, 'positions', xcenters+0.2, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', c.err);
     set(hb,'LineWidth', 2)
     set(gca, 'XLim', [0.2 3.8], 'XTick', xcenters, 'XTickLabel', {'Low', 'Med', 'High'}, 'FontSize', 16);
     ylabel('BOLD a.u.')
@@ -177,8 +179,8 @@ for r = 1:length(rois)
     % Upsampled post-decision motion figure
     h = figure;
     set(gcf, 'Position', [600 300 400 275])
-    corcolor = [0.7 1 0.7; 0.35 1 0.35; 0 1 0];
-    errcolor = [1 0.7 0.7; 1 0.35 0.35; 1 0 0];
+    corcolor = [0.52 0.65 0.74; 0.26 0.55 0.74; 0 0.45 0.74];
+    errcolor = [0.85 0.69 0.63; 0.85 0.51 0.36; 0.85 0.33 0.1];
     
     xMean = mean(subjectXtime);
     for i = 1:3
@@ -196,7 +198,6 @@ for r = 1:length(rois)
     legend({'Cor low', 'Err low', 'Cor med', 'Err med', 'Cor high', 'Err high'}, 'Location', 'NorthEast')
     legend boxoff
     set(gca, 'FontSize', 16, 'XLim', [0 max(xMean)])
-    line([0 max(xMean)], [0 0], 'LineStyle', '--', 'Color', 'k', 'LineWidth', 1.5)
     box off
     
 end

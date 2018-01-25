@@ -10,9 +10,9 @@
 addpath(genpath('~/Dropbox/Utils/fmri/MediationToolbox/'));
 addpath(genpath('~/Dropbox/Utils/fmri/CanlabCore/'));
 
-dir_datafiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/data';
-dir_modelfiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/regressors';
-dir_roiData = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_conf';
+dir_datafiles = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/data';
+dir_modelfiles = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/regressors';
+dir_roiData = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/fmri/roidata_conf';
 
 allRoiName = {'union_46', 'union_FPL', 'union_FPm'};    % which ROIs are Y variables
 model = 'ideal_dt'; % which model to extract out PDE predictions from

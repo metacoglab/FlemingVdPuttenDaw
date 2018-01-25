@@ -84,14 +84,17 @@ post_LORacc = [mean(mean_LORpost_cor_L) mean(mean_LORpost_cor_R) mean(mean_LORpo
 post_LOCacc = [mean(mean_LOCpost_cor_L) mean(mean_LOCpost_cor_R) mean(mean_LOCpost_err_L) mean(mean_LOCpost_err_R)];
 
 %% Summary figures collapsing over levels of pre coherence
+c.cor =  [0 0.45 0.74];
+c.err =  [0.85 0.33 0.10];
+
 h1 = figure;
 set(gcf, 'Position', [400 400 1200 300])
 subplot(1,3,1)
-plot([1 2 3], post_LORacc(1:3), 'g--', 'LineWidth', 3)
+plot([1 2 3], post_LORacc(1:3), 'Color', c.cor, 'LineStyle', '--', 'LineWidth', 3)
 hold on
-plot([1 2 3], post_LORacc(4:6), 'g', 'LineWidth', 3)
-plot([1 2 3]+0.2, post_LORacc(7:9), 'r--', 'LineWidth', 3)
-plot([1 2 3]+0.2, post_LORacc(10:12), 'r', 'LineWidth', 3)
+plot([1 2 3], post_LORacc(4:6), 'Color', c.cor, 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LORacc(7:9), 'Color', c.err, 'LineStyle', '--', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LORacc(10:12), 'Color', c.err, 'LineWidth', 3)
 set(gca, 'XLim', [0.5 3.5], 'XTick', [1 2 3], 'XTickLabel', {'Low', 'Med', 'High'}, 'FontSize', 16);
 xlabel('Postdecision motion strength','FontSize',20);
 ylabel('\Delta Log-odds rightward','FontSize',20)
@@ -100,11 +103,11 @@ legend boxoff
 box off
 
 subplot(1,3,2)
-plot([1 2 3], post_LOCacc(1:3), 'g--', 'LineWidth', 3)
+plot([1 2 3], post_LOCacc(1:3), 'Color', c.cor, 'LineStyle', '--', 'LineWidth', 3)
 hold on
-plot([1 2 3]+0.2, post_LOCacc(4:6), 'g', 'LineWidth', 3)
-plot([1 2 3], post_LOCacc(7:9), 'r--', 'LineWidth', 3)
-plot([1 2 3]+0.2, post_LOCacc(10:12), 'r', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LOCacc(4:6), 'Color', c.cor, 'LineWidth', 3)
+plot([1 2 3], post_LOCacc(7:9), 'Color', c.err, 'LineStyle', '--', 'LineWidth', 3)
+plot([1 2 3]+0.2, post_LOCacc(10:12), 'Color', c.err, 'LineWidth', 3)
 set(gca, 'XLim', [0.5 3.5], 'XTick', [1 2 3], 'XTickLabel', {'Low', 'Med', 'High'}, 'FontSize', 16);
 xlabel('Postdecision motion strength','FontSize',20);
 ylabel('\Delta Log-odds correct','FontSize',20)

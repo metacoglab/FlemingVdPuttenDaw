@@ -1,5 +1,5 @@
 % Implements multi-level mediation models on ROI data
-% Reproduces statistics used to create Figure 5 in Fleming, van der Putten & Daw
+% Reproduces statistics used to create Figure 4 in Fleming, van der Putten & Daw
 % Stored in stats_forward{r}, stats_reverse{r}, where r indexes ROI
 %
 % Requires Tor Wager's Mediation Toolbox and functions from CanLabCore available here:
@@ -13,9 +13,9 @@ close all
 cwd = pwd;
 
 addpath(genpath('~/Dropbox/Utils/fmri/MetaLabCore/'));
-dir_roiData_upsampled = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_upsample';
-dir_datafiles = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/data';
-dir_stats = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stats';
+dir_roiData_upsampled = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/fmri/roidata_upsample';
+dir_datafiles = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/data';
+dir_stats = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/stats';
 
 name_subj = {'sub12','sub13','sub14','sub15','sub16','sub17','sub18','sub19','sub23',...
     'sub24','sub25','sub26','sub27','sub28','sub30','sub31','sub32','sub33','sub34','sub35','sub36','sub37'};

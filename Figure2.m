@@ -14,8 +14,8 @@ Ndraws = 1000;    % how many draws from subject-level posteriors / simulated tri
 conf_sigma = 0.025; % Fixed parameter relating model to observed confidence
 
 cwd = pwd;
-baseDir = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stan/modelfits/indiv';
-dirData = '~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/data';
+baseDir = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/stan/modelfits/indiv';
+dirData = '~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/data';
 fitsDir = [baseDir fs model fs];
 
 if dataset == 2
@@ -172,6 +172,9 @@ model_conf_err(temp_nan) = NaN;
 
 %% PLOTS
 %
+c.cor =  [0 0.45 0.74];
+c.err =  [0.85 0.33 0.10];
+
 %% 3 x 3 performance
 h1a = figure;
 xpos = [1.2 2 2.8 4.2 5 5.8 7.2 8 8.8];
@@ -183,7 +186,8 @@ mean_model_perf = mean(model_perf);
 sem_model_perf = std(model_perf)./sqrt(length(subjects));
 ci_model_perf = sem_perf.*tinv(0.975,length(subjects)-1);
 % Subjects
-boxplot(perf, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'k')
+hb = boxplot(perf, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'k');
+set(hb,'LineWidth', 2)
 hold on
 % Model
 for group = 1:3
@@ -197,13 +201,14 @@ for group = 1:3
         h = fill(pX,pY,[0.5 0.5 0.5]);
         set(h,'edgecolor',[0.5 0.5 0.5]);
     end
-    plot(x, mu, 'k-', 'LineWidth', 1.5)
+    plot(x, mu, 'k-', 'LineWidth', 2)
 end
-boxplot(perf, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'k')
-set(gca, 'YLim', [50 100], 'XLim', [0.5 9.5], 'XTick', xpos, 'XTickLabel', {'PreL', 'PreM', 'PreH'}, 'FontSize', 14);
-text(xpos(2)-0.4, 45, 'PostL', 'FontSize', 14)
-text(xpos(5)-0.4, 45, 'PostM', 'FontSize', 14)
-text(xpos(8)-0.4, 45, 'PostH', 'FontSize', 14)
+hb = boxplot(perf, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'k');
+set(hb,'LineWidth', 2)
+set(gca, 'YLim', [0 100], 'XLim', [0.5 9.5], 'XTick', xpos, 'XTickLabel', {'PreL', 'PreM', 'PreH'}, 'FontSize', 14);
+text(xpos(2)-0.4, -10, 'PostL', 'FontSize', 14)
+text(xpos(5)-0.4, -10, 'PostM', 'FontSize', 14)
+text(xpos(8)-0.4, -10, 'PostH', 'FontSize', 14)
 ylabel('Performance (% correct)', 'FontSize', 18);
 box off
 
@@ -213,15 +218,21 @@ xpos = [1.2 2 2.8 4.2 5 5.8 7.2 8 8.8];
 set(gcf, 'Position', [200 200 500 300])
 hold on
 
+mean_conf_cor = nanmean(conf_cor);
+sem_conf_cor = nanstd(conf_cor)./sqrt(length(subjects));
+ci_conf_cor = sem_conf_cor.*tinv(0.975,length(subjects)-1);
 mean_model_conf_cor = nanmean(model_conf_cor);
 sem_model_conf_cor = nanstd(model_conf_cor)./sqrt(length(subjects));
 ci_model_conf_cor = sem_model_conf_cor.*tinv(0.975,length(subjects)-1);
+mean_conf_err = nanmean(conf_err);
+sem_conf_err = nanstd(conf_err)./sqrt(length(subjects));
+ci_conf_err = sem_conf_err.*tinv(0.975,length(subjects)-1);
 mean_model_conf_err = nanmean(model_conf_err);
 sem_model_conf_err = nanstd(model_conf_err)./sqrt(length(subjects));
 ci_model_conf_err = sem_model_conf_err.*tinv(0.975,length(subjects)-1);
 
 % Corrects - subjects
-boxplot(conf_cor, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'g')
+boxplot(conf_cor, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'g');
 % Corrects - model
 for group = 1:3
     x = xpos((group*3)-2:group*3);
@@ -230,13 +241,14 @@ for group = 1:3
     for p = 1:length(x)-1
         pX = [x(p) x(p+1) x(p+1) x(p)];
         pY = [mu(p)-se(p) mu(p+1)-se(p+1) mu(p+1)+se(p+1) mu(p)+se(p)];
-        h = fill(pX,pY,[0.5 1 0.5]);
-        set(h,'edgecolor',[0.5 1 0.5]);
+        h = fill(pX,pY,[0.35 0.6 0.74]);
+        set(h,'edgecolor',[0.35 0.6 0.74]);
     end
-    plot(x, mu, 'g-', 'LineWidth', 1.5)
+    plot(x, mu, 'Color', c.cor, 'LineWidth', 2)
 end
 % Corrects - subjects (2nd time around to ensure is displayed on top)
-boxplot(conf_cor, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'g')
+hb = boxplot(conf_cor, 'positions', xpos, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', c.cor);
+set(hb,'LineWidth', 2)
 % Errors - model
 for group = 1:3
     x = xpos((group*3)-2:group*3) + 0.4;
@@ -245,12 +257,13 @@ for group = 1:3
     for p = 1:length(x)-1
         pX = [x(p) x(p+1) x(p+1) x(p)];
         pY = [mu(p)-se(p) mu(p+1)-se(p+1) mu(p+1)+se(p+1) mu(p)+se(p)];
-        h = fill(pX,pY,[1 0.5 0.5]);
-        set(h,'edgecolor',[1 0.5 0.5]);
+        h = fill(pX,pY,[0.85 0.59 0.48]);
+        set(h,'edgecolor',[0.85 0.59 0.48]);
     end
-    plot(x, mu, 'r-', 'LineWidth', 1.5)
+    plot(x, mu, 'Color', c.err, 'LineWidth', 2)
 end
-boxplot(conf_err, 'positions', xpos+0.4, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', 'r')
+hb = boxplot(conf_err, 'positions', xpos+0.4, 'outliersize', 8, 'symbol', 'o', 'widths', 0.3, 'jitter', 0, 'colors', c.err);
+set(hb,'LineWidth', 2)
 
 set(gca, 'YLim', [0 1], 'XLim', [0.5 9.5], 'XTick', xpos+0.2, 'XTickLabel', {'PreL', 'PreM', 'PreH'}, 'FontSize', 14);
 text(xpos(2), -0.1, 'PostL', 'FontSize', 14)
@@ -268,12 +281,12 @@ for post = 1:3
         subplot(3,3,j);
         [n x] = hist(allConf_cor{j},bincenters);
         n = n./length(allConf_cor{j});  % normalise by number of corrects/incorrects
-        bar(x+0.015, n, 0.35, 'g');
+        bar(x+0.015, n, 0.35, 'FaceColor', c.cor);
         hold on
         
         [n x] = hist(allConf_err{j},bincenters);
         n = n./length(allConf_err{j});
-        bar(x-0.015, n, 0.35, 'r')
+        bar(x-0.015, n, 0.35, 'FaceColor', c.err)
         set(gca, 'XLim', [0 1], 'YLim', [0 1], 'FontSize', 14);
         
         if pre == 1 & post == 2
@@ -286,6 +299,9 @@ for post = 1:3
         j=j+1;
     end
 end
+if savePlots
+    export_fig([figDir 'prepost_data_density_dataset' model num2str(dataset) '.pdf'], '-pdf', '-transparent', '-painters', '-nocrop', h3)
+end
 
 h4 = figure;
 j=1;
@@ -295,11 +311,11 @@ for post = 1:3
         subplot(3,3,j);
         [n x] = hist(allModelConf_cor{j},bincenters);
         n = n./length(allModelConf_cor{j});
-        bar(x+0.015, n, 0.35, 'g');
+        bar(x+0.015, n, 0.35, 'FaceColor', c.cor);
         hold on
         [n x] = hist(allModelConf_err{j},bincenters);
         n = n./length(allModelConf_err{j});
-        bar(x-0.015, n, 0.35, 'r')
+        bar(x-0.015, n, 0.35, 'FaceColor', c.err)
         set(gca, 'XLim', [0 1], 'YLim', [0 1], 'FontSize', 14);
         
         if pre == 1 & post == 2

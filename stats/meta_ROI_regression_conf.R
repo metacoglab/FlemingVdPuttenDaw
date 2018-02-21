@@ -12,9 +12,9 @@ require(doBy)
 require(optimx)
 require(stargazer)
 options(contrasts = c("contr.treatment", "contr.poly")) # This is R defaults but set it anyway to be safe
-source("~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stats/errorBar.R")
+source("~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/stats/errorBar.R")
 
-dataDir = "~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_conf"
+dataDir = "~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/fmri/roidata_conf"
 subjects =c(seq(12,19), seq(23,28), seq(30,37))
 rois = c("pMFC", "union_46", "union_FPL", "union_FPm", "vmPFC", "rVS_FSL_structAtlas")
 
@@ -90,5 +90,5 @@ for (r in 1:length(rois)) {
   
 }
 
-stargazer(confModel_split1, confModel_split2, confModel_split3, confModel_split4, confModel_split5, confModel_split6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("Confidence <= 0.5", "Confidence > 0.5", "log(RT)"))
+stargazer(confModel_split1, confModel_split2, confModel_split3, confModel_split4, confModel_split5, confModel_split6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("Confidence <= 0.5", "Confidence > 0.5", "log(RT)"), report = ('vc*s'),  digits = 2, digits.extra = 1)
 

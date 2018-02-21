@@ -12,10 +12,10 @@ require(doBy)
 require(optimx)
 require(stargazer)
 options(contrasts = c("contr.treatment", "contr.poly")) # This is R defaults but set it anyway to be safe
-source("~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/stats/errorBar.R")
+source("~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/stats/errorBar.R")
 
-dataDir = "~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/fmri/roidata_post"
-modelDir = "~/Dropbox/Research/Metacognition/stateactionexpt/FlemingVdPuttenDaw/regressors"
+dataDir = "~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/fmri/roidata_post"
+modelDir = "~/Dropbox/Published/FlemingNN2018/Code&analysis/FlemingVdPuttenDaw/regressors"
 subjects =c(seq(12,19), seq(23,28), seq(30,37))
 rois = c("pMFC", "union_46", "union_FPL", "union_FPm", "vmPFC", "rVS_FSL_structAtlas")
 
@@ -120,5 +120,4 @@ for (r in 1:length(rois)) {
 }
 
 # Plot all regressions in one big table
-stargazer(postcohModel1, postcohModel2, postcohModel3, postcohModel4, postcohModel5, postcohModel6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("accuracy", "pre-decision coherence", "post-decision coherence", "pre*accuracy", "post*accuracy", "log(RT)"), order = c(2, 1, 3, 5, 6, 4))
-stargazer(logoddsModel1, logoddsModel2, logoddsModel3, logoddsModel4, logoddsModel5, logoddsModel6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("Log-odds correct (pre)", "Log-odds correct (post)", "log(RT)"))
+stargazer(postcohModel1, postcohModel2, postcohModel3, postcohModel4, postcohModel5, postcohModel6, star.cutoffs = c(0.05, 0.01, 0.001), keep.stat = c("n"), dep.var.labels = c("BOLD"), column.labels = c("pMFC", "area 46", "FPl", "FPm", "vmPFC", "v. striatum"), covariate.labels = c("accuracy", "pre-decision coherence", "post-decision coherence", "pre*accuracy", "post*accuracy", "log(RT)"), order = c(2, 1, 3, 5, 6, 4), report = ('vc*s'),  digits = 2, digits.extra = 1)

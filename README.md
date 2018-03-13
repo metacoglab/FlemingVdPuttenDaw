@@ -2,7 +2,7 @@
 
 This repository contains analysis code for the following paper:
 
-Fleming, van der Putten & Daw “Neural mediators of changes of mind about perceptual decisions” (in press) Nature Neuroscience
+<a href="http://rdcu.be/ISpH">Fleming, van der Putten & Daw “Neural mediators of changes of mind about perceptual decisions” (in press) Nature Neuroscience</a>
 
 Anonymised behavioural data files and preprocessed ROI data are included in the repository to enable replication of data analyses and rapid generation of the figures in the paper. The group-level T-maps reported in the paper are available at NeuroVault.
 
